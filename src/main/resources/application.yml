@@ -3,6 +3,8 @@ spring:
         url: jdbc:mysql://localhost:3306/dermis
         username: root
         password:
+    jpa:
+        generate-ddl: true
 
 discord:
     credentials:

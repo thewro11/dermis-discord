@@ -7,7 +7,7 @@ import discord4j.core.GatewayDiscordClient;
 import me.thewro.dermis.events.UserRegisterEventHandler;
 
 /**
- * Add event handler and @Autowired annotation.
+ * Add event handler and Autowired annotation.
  * Then add subscription to gateway.
  */
 @Component
