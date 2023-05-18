@@ -14,4 +14,8 @@ public class CommandConfig {
 
     private String status;
 
+    private String update;
+
+    private String test;
+
 }

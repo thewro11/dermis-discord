@@ -5,6 +5,10 @@ import org.springframework.stereotype.Component;
 
 import discord4j.core.GatewayDiscordClient;
 import me.thewro.dermis.events.ApproveButtonEventHandler;
+import me.thewro.dermis.events.RejectButtonEventHandler;
+import me.thewro.dermis.events.StatusEventHandler;
+import me.thewro.dermis.events.TestCommandEventHandler;
+import me.thewro.dermis.events.UpdateEventSubscriber;
 import me.thewro.dermis.events.UserRegisterEventHandler;
 
 /**
@@ -20,6 +24,18 @@ public class DiscordEventSubscriber {
     @Autowired
     ApproveButtonEventHandler approveButtonEventHandler;
 
+    @Autowired
+    RejectButtonEventHandler rejectButtonEventHandler;
+
+    @Autowired
+    StatusEventHandler statusEventHandler;
+
+    @Autowired
+    UpdateEventSubscriber updateEventSubscriber;
+
+    @Autowired
+    TestCommandEventHandler testCommandEventHandler;
+
     public void subscribe(GatewayDiscordClient gateway) {
 
         gateway.on(userRegisterEventHandler.getEventType()).subscribe(e -> {
@@ -31,6 +47,30 @@ public class DiscordEventSubscriber {
         gateway.on(approveButtonEventHandler.getEventType()).subscribe(e -> {
             if (approveButtonEventHandler.triggerOn(e)) {
                 approveButtonEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(rejectButtonEventHandler.getEventType()).subscribe(e -> {
+            if (rejectButtonEventHandler.triggerOn(e)) {
+                rejectButtonEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(statusEventHandler.getEventType()).subscribe(e -> {
+            if (statusEventHandler.triggerOn(e)) {
+                statusEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(updateEventSubscriber.getEventType()).subscribe(e -> {
+            if (updateEventSubscriber.triggerOn(e)) {
+                updateEventSubscriber.handle(e);
+            }
+        });
+
+        gateway.on(testCommandEventHandler.getEventType()).subscribe(e -> {
+            if (testCommandEventHandler.triggerOn(e)) {
+                testCommandEventHandler.handle(e);
             }
         });
 

@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import me.thewro.dermis.entities.enums.RequesterStatus;
 
 @Entity
@@ -28,7 +27,6 @@ public class Subscriber extends Requester {
 
     private double balance;
 
-    @NonNull
-    private LocalDateTime nextPaymentAt;
+    private double onHold;
 
 }

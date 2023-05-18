@@ -16,24 +16,19 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Image.Format;
 import me.thewro.dermis.App;
 import me.thewro.dermis.entities.Requester;
-import me.thewro.dermis.entities.Subscriber;
 import me.thewro.dermis.entities.enums.ActionType;
 import me.thewro.dermis.entities.enums.DeveloperCustomId;
 import me.thewro.dermis.entities.repositories.RequesterRepository;
 import me.thewro.dermis.services.RequesterConsiderationService;
-import me.thewro.dermis.services.SubscriberService;
 
 @Component
-public class ApproveButtonEventHandler implements DiscordEventSubscribable<ButtonInteractionEvent> {
-
-    @Autowired
-    private RequesterConsiderationService requesterConsiderationService;
-
-    @Autowired
-    private SubscriberService subscriberService;
+public class RejectButtonEventHandler implements DiscordEventSubscribable<ButtonInteractionEvent> {
 
     @Autowired
     private RequesterRepository requesterRepository;
+
+    @Autowired
+    private RequesterConsiderationService requesterConsiderationService;
 
     @Override
     public Class<ButtonInteractionEvent> getEventType() {
@@ -42,7 +37,7 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
 
     @Override
     public boolean triggerOn(ButtonInteractionEvent event) {
-        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_APPROVE);
+        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_DENY);
     }
 
     @Override
@@ -57,7 +52,7 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
             Guild discordGuild = App.gatewayDiscordClient.getGuildById(Snowflake.of(requester.getGuildId())).block();
 
             EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
-                                                .title("✅  Approved Spotify Subscription Request")
+                                                .title("⛔️  Rejected Spotify Subscription Request")
                                                 .thumbnail(discordUser.getAvatarUrl())
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
@@ -65,7 +60,7 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
                                                 .addField("From: ", 
                                                                 discordGuild.getName(), 
                                                                 false)
-                                                .footer(ActionType.REQUEST_APPROVED.NAME + 
+                                                .footer(ActionType.REQUEST_DENIED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
                                                         discordGuild.getIconUrl(Format.PNG).get())
@@ -75,22 +70,19 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
             .withComponents()
             .block();
 
-            Subscriber subscriber = requesterConsiderationService.approve(App.owner, requester, currentTime);
+            requesterConsiderationService.reject(App.owner, requester, currentTime);
 
             EmbedCreateSpec embedCreateSpec2 = EmbedCreateSpec.builder()
-                                                .title("✅  Your Spotify Subscription Has Been Approved!")
+                                                .title("⛔️  Your Spotify Subscription Has Been Rejected")
                                                 .thumbnail(discordUser.getAvatarUrl())
-                                                .addField("", "You are now a part of our Spotify family.", true)
+                                                .addField("", "We regret to inform you that you are not qualified for this subscription.", true)
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                                 false)
                                                 .addField("From: ", 
                                                                 discordGuild.getName(), 
                                                                 false)
-                                                .addField("Next Payment: ", 
-                                                                subscriberService.calculateNextDueDateTime(subscriber).format(DateTimeFormatter.ofPattern("dd/MM/uuuu")), 
-                                                                false)
-                                                .footer(ActionType.REQUEST_APPROVED.NAME + 
+                                                .footer(ActionType.REQUEST_DENIED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
                                                         discordGuild.getIconUrl(Format.PNG).get())
@@ -105,5 +97,5 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
             event.deleteReply().block();
         }
     }
-
+    
 }

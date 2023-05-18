@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -17,6 +18,7 @@ import me.thewro.dermis.config.DiscordConfig;
 import me.thewro.dermis.events.subscribers.DiscordEventSubscriber;
 
 @SpringBootApplication
+@EnableScheduling
 public class App {
 
 	@Autowired

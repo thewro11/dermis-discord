@@ -11,9 +11,13 @@ discord:
     credentials:
         token: NzU2MDI5MTgxMDAyNzc2NjU5.GIKMiV.rU4I3dcIfxnd_9-pSjw4En9KxRUZGpV1s-E4SM
     commands:
+        test: 1098283014355693700
         register: 1098286988517453957
         status: 1100439058074837054
+        update: 1108829125004775545
+    version: 0.1β
 
 payment:
     invoice-date: 11
+    notification: 0 0 19 ${payment.invoice-date} * ?
     monthly-price: 34.00

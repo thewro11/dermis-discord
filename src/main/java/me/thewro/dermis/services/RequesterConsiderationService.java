@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import discord4j.core.object.entity.User;
 import me.thewro.dermis.entities.Requester;
 import me.thewro.dermis.entities.Subscriber;
+import me.thewro.dermis.entities.enums.RequesterStatus;
 import me.thewro.dermis.entities.repositories.RequesterRepository;
 import me.thewro.dermis.entities.repositories.SubscriberRepository;
 
@@ -20,17 +21,20 @@ public class RequesterConsiderationService {
     @Autowired
     private SubscriberRepository subscriberRepository;
 
-    @Autowired
-    private SubscriberService subscriberService;
-
     public Subscriber approve(User owner, Requester requester, LocalDateTime currentTime) {
         Subscriber subscriber = new Subscriber(requester, owner, currentTime);
-        subscriber.setNextPaymentAt(subscriberService.calculateNextDueDateTime(subscriber));
 
         requesterRepository.delete(requester);
         subscriberRepository.save(subscriber);
 
         return subscriber;
+    }
+
+    public void reject(User owner, Requester requester, LocalDateTime currentTime) {
+        requester.setConsideredAt(currentTime);
+        requester.setConsideredByOwnerId(owner.getId().asString());
+        requester.setStatus(RequesterStatus.DENIED);
+        requesterRepository.save(requester);
     }
 
 }
