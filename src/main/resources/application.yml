@@ -5,6 +5,7 @@ spring:
         password:
     jpa:
         generate-ddl: true
+        hibernate.ddl-auto: create-drop
 
 discord:
     credentials:

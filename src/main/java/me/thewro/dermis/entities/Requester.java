@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -18,8 +18,9 @@ import me.thewro.dermis.entities.enums.RequesterStatus;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Requester {
-    
+
     @Id
     @NonNull
     private String userId;
@@ -36,6 +37,8 @@ public class Requester {
     @NonNull
     private LocalDateTime requestedAt;
 
-    private LocalDateTime approvedAt;
+    private LocalDateTime consideredAt;
+
+    private String consideredByOwnerId;
 
 }
