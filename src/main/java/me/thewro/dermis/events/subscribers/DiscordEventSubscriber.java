@@ -9,8 +9,9 @@ import me.thewro.dermis.events.ApprovePaymentEventHandler;
 import me.thewro.dermis.events.ApprovePaymentModalOnSubmitEventHandler;
 import me.thewro.dermis.events.PayEventHandler;
 import me.thewro.dermis.events.RejectButtonEventHandler;
+import me.thewro.dermis.events.RejectPaymentButtonEventHandler;
+import me.thewro.dermis.events.SilentlyRejectPaymentButtonEventHandler;
 import me.thewro.dermis.events.StatusEventHandler;
-import me.thewro.dermis.events.TestCommandEventHandler;
 import me.thewro.dermis.events.UpdateEventSubscriber;
 import me.thewro.dermis.events.UserRegisterEventHandler;
 
@@ -37,9 +38,6 @@ public class DiscordEventSubscriber {
     UpdateEventSubscriber updateEventSubscriber;
 
     @Autowired
-    TestCommandEventHandler testCommandEventHandler;
-
-    @Autowired
     PayEventHandler payEventHandler;
 
     @Autowired
@@ -47,6 +45,12 @@ public class DiscordEventSubscriber {
 
     @Autowired
     ApprovePaymentModalOnSubmitEventHandler approvePaymentModalOnSubmitEventHandler;
+
+    @Autowired
+    RejectPaymentButtonEventHandler rejectPaymentButtonEventHandler;
+
+    @Autowired
+    SilentlyRejectPaymentButtonEventHandler silentlyRejectPaymentButtonEventHandler;
 
     public void subscribe(GatewayDiscordClient gateway) {
 
@@ -98,9 +102,15 @@ public class DiscordEventSubscriber {
             }
         });
 
-        gateway.on(testCommandEventHandler.getEventType()).subscribe(e -> {
-            if (testCommandEventHandler.triggerOn(e)) {
-                testCommandEventHandler.handle(e);
+        gateway.on(rejectPaymentButtonEventHandler.getEventType()).subscribe(e -> {
+            if (rejectPaymentButtonEventHandler.triggerOn(e)) {
+                rejectPaymentButtonEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(silentlyRejectPaymentButtonEventHandler.getEventType()).subscribe(e -> {
+            if (silentlyRejectPaymentButtonEventHandler.triggerOn(e)) {
+                silentlyRejectPaymentButtonEventHandler.handle(e);
             }
         });
 

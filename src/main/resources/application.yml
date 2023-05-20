@@ -11,7 +11,6 @@ discord:
     credentials:
         token: NzU2MDI5MTgxMDAyNzc2NjU5.GIKMiV.rU4I3dcIfxnd_9-pSjw4En9KxRUZGpV1s-E4SM
     commands:
-        test: 1098283014355693700
         register: 1098286988517453957
         status: 1108847417945759936
         update: 1108829125004775545

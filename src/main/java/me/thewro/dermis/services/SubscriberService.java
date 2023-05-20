@@ -14,6 +14,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import me.thewro.dermis.App;
 import me.thewro.dermis.config.PaymentConfig;
 import me.thewro.dermis.entities.Subscriber;
+import me.thewro.dermis.entities.enums.PaymentStatus;
+import me.thewro.dermis.entities.repositories.PaymentRepository;
 import me.thewro.dermis.entities.repositories.SubscriberRepository;
 
 @Service
@@ -24,6 +26,9 @@ public class SubscriberService {
 
     @Autowired
     private SubscriberRepository subscriberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     public double calculatePriceUntilNextMonth(Subscriber subscriber) {
         double monthlyPrice = paymentConfig.getMonthlyPrice();
@@ -161,6 +166,10 @@ public class SubscriberService {
                 .withEmbeds(embedCreateSpec)
                 .block();
         }
+    }
+
+    public int findOnHoldPaymentAmount(Subscriber subscriber) {
+        return paymentRepository.findByPayeeIdAndStatus(subscriber.getUserId(), PaymentStatus.NEW).size();
     }
 
 }

@@ -16,8 +16,6 @@ public class CommandConfig {
 
     private String update;
 
-    private String test;
-
     private String pay;
 
 }
