@@ -18,4 +18,6 @@ public class CommandConfig {
 
     private String test;
 
+    private String pay;
+
 }

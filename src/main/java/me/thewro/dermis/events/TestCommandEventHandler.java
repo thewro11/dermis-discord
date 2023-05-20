@@ -33,7 +33,7 @@ public class TestCommandEventHandler implements DiscordEventSubscribable<ChatInp
 
     @Override
     public void handle(ChatInputInteractionEvent event) {
-        subscriberService.sendPaymentNotification(subscriberRepository.findById("157475157336653824").get());
+        event.reply("This command is only for experimenting and will be deleted in the future.").subscribe();
     }
     
 }

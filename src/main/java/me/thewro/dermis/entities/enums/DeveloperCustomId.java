@@ -1,7 +1,16 @@
 package me.thewro.dermis.entities.enums;
 
 public enum DeveloperCustomId {
-    BUTTON_APPROVE,
-    BUTTON_DENY;
+    BUTTON_APPROVE_REQUEST,
+    BUTTON_DENY_REQUEST,
+    BUTTON_APPROVE_PAYMENT,
+    BUTTON_DENY_PAYMENT,
+    BUTTON_DENY_WITHOUT_NOTICE_PAYMENT,
+
+    MODAL_PAYMENT_INPUT,
+
+    TEXT_INPUT_MESSAGE_ID,
+    TEXT_INPUT_PAYMENT,
+    
 
 }

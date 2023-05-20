@@ -37,7 +37,7 @@ public class RejectButtonEventHandler implements DiscordEventSubscribable<Button
 
     @Override
     public boolean triggerOn(ButtonInteractionEvent event) {
-        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_DENY);
+        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_DENY_REQUEST);
     }
 
     @Override

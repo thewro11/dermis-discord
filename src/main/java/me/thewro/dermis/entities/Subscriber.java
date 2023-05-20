@@ -1,9 +1,11 @@
 package me.thewro.dermis.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import discord4j.core.object.entity.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,7 @@ public class Subscriber extends Requester {
 
     private double balance;
 
-    private double onHold;
+    @OneToMany
+    private List<Payment> payments;
 
 }

@@ -83,8 +83,8 @@ public class UserRegisterEventHandler implements DiscordEventSubscribable<ChatIn
                             .withEmbeds(embedCreateSpec)
                             .withComponents(
                                 ActionRow.of(
-                                    Button.success(DeveloperCustomId.BUTTON_APPROVE.name(), ReactionEmoji.unicode("✔"), "Approve"), 
-                                    Button.secondary(DeveloperCustomId.BUTTON_DENY.name(), ReactionEmoji.unicode("❌"), "Deny")
+                                    Button.success(DeveloperCustomId.BUTTON_APPROVE_REQUEST.name(), ReactionEmoji.unicode("✔"), "Approve"), 
+                                    Button.secondary(DeveloperCustomId.BUTTON_DENY_REQUEST.name(), ReactionEmoji.unicode("❌"), "Deny")
                                 )
                             ).block();
 

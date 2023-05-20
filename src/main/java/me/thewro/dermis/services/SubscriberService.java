@@ -27,7 +27,7 @@ public class SubscriberService {
 
     public double calculatePriceUntilNextMonth(Subscriber subscriber) {
         double monthlyPrice = paymentConfig.getMonthlyPrice();
-        double balance = subscriber.getBalance() + subscriber.getOnHold();
+        double balance = subscriber.getBalance();
         double amount = balance % monthlyPrice;
 
         if (balance < 0) {
@@ -51,7 +51,7 @@ public class SubscriberService {
     public LocalDateTime calculateNextDueDateTime(Subscriber subscriber) {
         int monthAmount = 1;
         
-        double balance = subscriber.getBalance() + subscriber.getOnHold();
+        double balance = subscriber.getBalance();
         double monthlyPrice = paymentConfig.getMonthlyPrice();
         LocalDateTime dueDateTime = LocalDateTime.now().withHour(19).withMinute(0).withNano(0).withSecond(0);
 

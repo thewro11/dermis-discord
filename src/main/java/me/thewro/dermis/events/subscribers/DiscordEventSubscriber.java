@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 
 import discord4j.core.GatewayDiscordClient;
 import me.thewro.dermis.events.ApproveButtonEventHandler;
+import me.thewro.dermis.events.ApprovePaymentEventHandler;
+import me.thewro.dermis.events.ApprovePaymentModalOnSubmitEventHandler;
+import me.thewro.dermis.events.PayEventHandler;
 import me.thewro.dermis.events.RejectButtonEventHandler;
 import me.thewro.dermis.events.StatusEventHandler;
 import me.thewro.dermis.events.TestCommandEventHandler;
@@ -36,6 +39,15 @@ public class DiscordEventSubscriber {
     @Autowired
     TestCommandEventHandler testCommandEventHandler;
 
+    @Autowired
+    PayEventHandler payEventHandler;
+
+    @Autowired
+    ApprovePaymentEventHandler approvePaymentEventHandler;
+
+    @Autowired
+    ApprovePaymentModalOnSubmitEventHandler approvePaymentModalOnSubmitEventHandler;
+
     public void subscribe(GatewayDiscordClient gateway) {
 
         gateway.on(userRegisterEventHandler.getEventType()).subscribe(e -> {
@@ -65,6 +77,24 @@ public class DiscordEventSubscriber {
         gateway.on(updateEventSubscriber.getEventType()).subscribe(e -> {
             if (updateEventSubscriber.triggerOn(e)) {
                 updateEventSubscriber.handle(e);
+            }
+        });
+
+        gateway.on(payEventHandler.getEventType()).subscribe(e -> {
+            if (payEventHandler.triggerOn(e)) {
+                payEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(approvePaymentEventHandler.getEventType()).subscribe(e -> {
+            if (approvePaymentEventHandler.triggerOn(e)) {
+                approvePaymentEventHandler.handle(e);
+            }
+        });
+
+        gateway.on(approvePaymentModalOnSubmitEventHandler.getEventType()).subscribe(e -> {
+            if (approvePaymentModalOnSubmitEventHandler.triggerOn(e)) {
+                approvePaymentModalOnSubmitEventHandler.handle(e);
             }
         });
 

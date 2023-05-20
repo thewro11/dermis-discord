@@ -42,7 +42,7 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
 
     @Override
     public boolean triggerOn(ButtonInteractionEvent event) {
-        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_APPROVE);
+        return DeveloperCustomId.valueOf(event.getCustomId()).equals(DeveloperCustomId.BUTTON_APPROVE_REQUEST);
     }
 
     @Override
