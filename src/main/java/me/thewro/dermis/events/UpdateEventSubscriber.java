@@ -36,7 +36,11 @@ public class UpdateEventSubscriber implements DiscordEventSubscribable<ChatInput
 
     @Override
     public void handle(ChatInputInteractionEvent event) {
-        event.deferReply().withEphemeral(true).block();
+        try {
+            event.deferReply().withEphemeral(true).block();
+        } catch (Exception e) {
+            
+        }
 
         List<ApplicationCommandInteractionOption> options = event.getOptions();
         User discordUserSubscriber = options.get(0).getValue().get().asUser().block();
@@ -46,30 +50,35 @@ public class UpdateEventSubscriber implements DiscordEventSubscribable<ChatInput
             reason = options.get(2).getValue().get().asString();
         }
 
-        Subscriber subscriber = subscriberRepository.findById(discordUserSubscriber.getId().asString()).get();
-        subscriber.setBalance(balance);
-        subscriberRepository.save(subscriber);
-
-        EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
-                                                .title("💸  Your Spotify payment has been updated.")
-                                                .thumbnail(discordUserSubscriber.getAvatarUrl())
-                                                .addField("Subscriber: ", 
-                                                                discordUserSubscriber.getMention() + " (" + discordUserSubscriber.getTag() + ")", 
-                                                                false)
-                                                .addField("Balance: ", 
-                                                                String.valueOf(subscriber.getBalance()),
-                                                                false)
-                                                .addField("Reason: ", 
-                                                                reason,
-                                                                false)
-                                                .build();
-        PrivateChannel privateChannel = discordUserSubscriber.getPrivateChannel().block();
-        privateChannel
-            .createMessage("")
-            .withEmbeds(embedCreateSpec)
-            .block();
-
-        event.deleteReply().block();
+        try {
+            Subscriber subscriber = subscriberRepository.findById(discordUserSubscriber.getId().asString()).get();
+            subscriber.setBalance(balance);
+            subscriberRepository.save(subscriber);
+    
+            EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
+                                                    .title("💸  Your Spotify payment has been updated.")
+                                                    .thumbnail(discordUserSubscriber.getAvatarUrl())
+                                                    .addField("Subscriber: ", 
+                                                                    discordUserSubscriber.getMention() + " (" + discordUserSubscriber.getTag() + ")", 
+                                                                    false)
+                                                    .addField("Balance: ", 
+                                                                    String.valueOf(subscriber.getBalance()),
+                                                                    false)
+                                                    .addField("Reason: ", 
+                                                                    reason,
+                                                                    false)
+                                                    .build();
+            PrivateChannel privateChannel = discordUserSubscriber.getPrivateChannel().block();
+            privateChannel
+                .createMessage("")
+                .withEmbeds(embedCreateSpec)
+                .block();
+    
+            event.deleteReply().block();
+            
+        } catch (Exception e) {
+            event.editReply("An error occurred. Please try again.").block();
+        }
     }
     
 }

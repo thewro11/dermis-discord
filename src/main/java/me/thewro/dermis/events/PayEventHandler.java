@@ -56,31 +56,35 @@ public class PayEventHandler implements DiscordEventSubscribable<MessageInteract
         Guild discordGuild = event.getInteraction().getGuild().block();
         List<Attachment> attachments = event.getTargetMessage().block().getAttachments();
         
-        Subscriber subscriber = subscriberRepository.findById(payer.getId().asString()).get();
-        
-        for (Attachment attachment : attachments) {
-            EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
-                .title("👨‍💼  New Spotify Subscription Request")
-                .thumbnail(payer.getAvatarUrl())
-                .addField("Requester: ", 
-                                payer.getMention() + " (" + payer.getTag() + ")", 
-                                false)
-                .footer("Payment sent" + 
-                        " at " + 
-                        currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                        discordGuild.getIconUrl(Format.PNG).get())
-                .image(attachment.getUrl())
-                .build();
-
-            Message message = App.ownerPrivateChannel.createMessage(embedCreateSpec).withComponents(
-                ActionRow.of(Button.success(DeveloperCustomId.BUTTON_APPROVE_PAYMENT.name(), "Approve"), Button.danger(DeveloperCustomId.BUTTON_DENY_PAYMENT.name(), "Deny"), Button.primary(DeveloperCustomId.BUTTON_DENY_WITHOUT_NOTICE_PAYMENT.name(), "Deny without Notice"))
-            ).block();
-
-            Payment payment = new Payment(message.getId().asString(), subscriber, payer.getId().asString(), payer.getId().asString(), attachment.getUrl());
-            paymentRepository.save(payment);
+        try {
+            Subscriber subscriber = subscriberRepository.findById(payer.getId().asString()).get();
+            for (Attachment attachment : attachments) {
+                EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
+                    .title("👨‍💼  New Spotify Subscription Request")
+                    .thumbnail(payer.getAvatarUrl())
+                    .addField("Requester: ", 
+                                    payer.getMention() + " (" + payer.getTag() + ")", 
+                                    false)
+                    .footer("Payment sent" + 
+                            " at " + 
+                            currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
+                            discordGuild.getIconUrl(Format.PNG).get())
+                    .image(attachment.getUrl())
+                    .build();
+    
+                Message message = App.ownerPrivateChannel.createMessage(embedCreateSpec).withComponents(
+                    ActionRow.of(Button.success(DeveloperCustomId.BUTTON_APPROVE_PAYMENT.name(), "Approve"), Button.danger(DeveloperCustomId.BUTTON_DENY_PAYMENT.name(), "Deny"), Button.primary(DeveloperCustomId.BUTTON_DENY_WITHOUT_NOTICE_PAYMENT.name(), "Deny without Notice"))
+                ).block();
+    
+                Payment payment = new Payment(message.getId().asString(), subscriber, payer.getId().asString(), payer.getId().asString(), attachment.getUrl());
+                paymentRepository.save(payment);
+            }
+    
+            event.editReply(attachments.size() + " attachment" + (attachments.size() == 1 ? " has" : "s have") + " been sent.").block();
+        } catch (Exception e) {
+            event.editReply("An error occurred. Please try again.").block();
         }
-
-        event.editReply(attachments.size() + " attachment" + (attachments.size() == 1 ? " has" : "s have") + " been sent.").block();
+    
     }
     
 }

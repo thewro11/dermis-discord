@@ -36,15 +36,19 @@ public class ApprovePaymentEventHandler implements DiscordEventSubscribable<Butt
         Payment payment = paymentRepository.findById(messageId).get();
         User discordUserSubscriber = App.gatewayDiscordClient.getUserById(Snowflake.of(payment.getPayeeId())).block();
 
-        event.presentModal(InteractionPresentModalSpec.create()
-            .withTitle("Update Payment for " + discordUserSubscriber.getTag())
-            .withCustomId(DeveloperCustomId.MODAL_PAYMENT_INPUT.name())
-            .withComponents(
-                ActionRow.of(TextInput.small(DeveloperCustomId.TEXT_INPUT_MESSAGE_ID.name(), "Message ID").prefilled(messageId).placeholder(messageId).required()),
-                ActionRow.of(TextInput.small(DeveloperCustomId.TEXT_INPUT_PAYMENT.name(), "Input Paid Amount (฿)").placeholder("34.00").required())
+        try {
+            event.presentModal(InteractionPresentModalSpec.create()
+                .withTitle("Update Payment for " + discordUserSubscriber.getTag())
+                .withCustomId(DeveloperCustomId.MODAL_PAYMENT_INPUT.name())
+                .withComponents(
+                    ActionRow.of(TextInput.small(DeveloperCustomId.TEXT_INPUT_MESSAGE_ID.name(), "Message ID").prefilled(messageId).placeholder(messageId).required()),
+                    ActionRow.of(TextInput.small(DeveloperCustomId.TEXT_INPUT_PAYMENT.name(), "Input Paid Amount (฿)").placeholder("34.00").required())
+                )
             )
-        )
-        .block();
+            .block();
+        } catch (Exception e) {
+            
+        }
 
     }
     

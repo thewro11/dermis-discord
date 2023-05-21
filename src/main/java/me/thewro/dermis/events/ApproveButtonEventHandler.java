@@ -47,14 +47,17 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
 
     @Override
     public void handle(ButtonInteractionEvent event) {
-        event.deferReply().withEphemeral(true).block();
+        try {
+            event.deferReply().withEphemeral(true).block();
+        } catch (Exception e) {
+            
+        }
 
         Message message = App.gatewayDiscordClient.getMessageById(App.ownerPrivateChannel.getId(), event.getInteraction().getMessageId().get()).block();
         Requester requester = requesterRepository.findByRequestMessageId(message.getId().asString());
         if (requester != null) {
             LocalDateTime currentTime = LocalDateTime.now();
             User discordUser = App.gatewayDiscordClient.getUserById(Snowflake.of(requester.getUserId())).block();
-            Guild discordGuild = App.gatewayDiscordClient.getGuildById(Snowflake.of(requester.getGuildId())).block();
 
             EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
                                                 .title("✅  Approved Spotify Subscription Request")
@@ -62,13 +65,10 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                                 false)
-                                                .addField("From: ", 
-                                                                discordGuild.getName(), 
-                                                                false)
                                                 .footer(ActionType.REQUEST_APPROVED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                                                        discordGuild.getIconUrl(Format.PNG).get())
+                                                        App.owner.getAvatarUrl())
                                                 .build();
             message.edit()
             .withEmbeds(embedCreateSpec)
@@ -84,16 +84,13 @@ public class ApproveButtonEventHandler implements DiscordEventSubscribable<Butto
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                                 false)
-                                                .addField("From: ", 
-                                                                discordGuild.getName(), 
-                                                                false)
                                                 .addField("Next Payment: ", 
                                                                 subscriberService.calculateNextDueDateTime(subscriber).format(DateTimeFormatter.ofPattern("dd/MM/uuuu")), 
                                                                 false)
                                                 .footer(ActionType.REQUEST_APPROVED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                                                        discordGuild.getIconUrl(Format.PNG).get())
+                                                        App.owner.getAvatarUrl())
                                                 .build();
 
             PrivateChannel privateChannel = discordUser.getPrivateChannel().block();

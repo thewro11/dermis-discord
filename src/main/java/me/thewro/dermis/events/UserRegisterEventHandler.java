@@ -2,6 +2,7 @@ package me.thewro.dermis.events;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import me.thewro.dermis.config.CommandConfig;
 import me.thewro.dermis.entities.Requester;
 import me.thewro.dermis.entities.enums.ActionType;
 import me.thewro.dermis.entities.enums.DeveloperCustomId;
+import me.thewro.dermis.entities.enums.RequesterStatus;
 import me.thewro.dermis.entities.repositories.RequesterRepository;
 
 @Component
@@ -63,6 +65,16 @@ public class UserRegisterEventHandler implements DiscordEventSubscribable<ChatIn
 
         LocalDateTime currentTime = LocalDateTime.now();
         User discordUser = event.getInteraction().getUser();
+
+        Optional<Requester> optionalRequester = requesterRepository.findById(discordUser.getId().asString());
+        if (optionalRequester.isPresent()) {
+            Requester req = optionalRequester.get();
+            if (req.getStatus() != RequesterStatus.DENIED) {
+                event.editReply("An error occurred. Please try again.").block();
+                return;
+            }
+        }
+
         Guild discordGuild = event.getInteraction().getGuild().block();
         EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
                                             .title("👨‍💼  New Spotify Subscription Request")
@@ -70,13 +82,10 @@ public class UserRegisterEventHandler implements DiscordEventSubscribable<ChatIn
                                             .addField("Requester: ", 
                                                             discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                             false)
-                                            .addField("From: ", 
-                                                            discordGuild.getName(), 
-                                                            false)
                                             .footer(ActionType.REQUEST_RECEIVED.NAME + 
                                                     " at " + 
                                                     currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                                                    discordGuild.getIconUrl(Format.PNG).get())
+                                                    App.owner.getAvatarUrl())
                                             .build();
         Message message = App.ownerPrivateChannel
                             .createMessage("")

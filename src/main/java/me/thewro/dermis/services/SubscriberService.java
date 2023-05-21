@@ -1,6 +1,7 @@
 package me.thewro.dermis.services;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +45,18 @@ public class SubscriberService {
 
     public double calculatePriceUntilNextYear(Subscriber subscriber) {
         LocalDateTime dueDateTime = calculateNextDueDateTime(subscriber);
-        int monthAmount = 1;
-        if (!(dueDateTime.getMonthValue() == 1 && dueDateTime.getDayOfMonth() < paymentConfig.getInvoiceDate())) {
-            monthAmount = 13 - dueDateTime.getMonthValue();
-        }
-        double balance = subscriber.getBalance() - monthAmount * paymentConfig.getMonthlyPrice();
+        double balance = 0;
+        if (!(dueDateTime.getMonthValue() == 1)) {
+            int monthAmount = 13 - dueDateTime.getMonthValue();
 
-        return Math.abs(balance);
+            balance = monthAmount * paymentConfig.getMonthlyPrice();
+            if (subscriber.getBalance() >= 0) {
+                balance -= subscriber.getBalance() % paymentConfig.getMonthlyPrice();
+            } else {
+                balance -= subscriber.getBalance();
+            }
+        }
+        return balance;
     }
 
     public LocalDateTime calculateNextDueDateTime(Subscriber subscriber) {
@@ -118,44 +124,29 @@ public class SubscriberService {
     public void sendPaymentNotification(Subscriber subscriber) {
         User subscriberDiscordUser = App.gatewayDiscordClient.getUserById(Snowflake.of(subscriber.getUserId())).block();
         if (subscriber.getBalance() < 0) {
-            EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
-                                                    .title("💸  Your Spotify Subscription Plan")
-                                                    .thumbnail(subscriberDiscordUser.getAvatarUrl())
-                                                    .addField("Subscriber: ", 
-                                                                    subscriberDiscordUser.getMention() + " (" + subscriberDiscordUser.getTag() + ")", 
-                                                                    false)
-                                                    .addField("Price (until ${month}): ", 
-                                                                    String.valueOf(calculatePriceUntilNextMonth(subscriber)), 
-                                                                    false)
-                                                    .addField("Price (until ${year}): ", 
-                                                                    String.valueOf(calculatePriceUntilNextYear(subscriber)), 
-                                                                    false)
-                                                    .build();
-            PrivateChannel privateChannel = subscriberDiscordUser.getPrivateChannel().block();
-            privateChannel
-                .createMessage("")
-                .withEmbeds(embedCreateSpec)
-                .block();
+            sendAutomaticPaymentNotification(subscriber);
         } else {
             EmbedCreateSpec.Builder embedCreateSpecBuilder = EmbedCreateSpec.builder()
-                                                    .title("💸  Your Spotify Subscription Plan")
+                                                    .title("💸  Your Spotify Subscription Status")
                                                     .thumbnail(subscriberDiscordUser.getAvatarUrl())
                                                     .addField("Subscriber: ", 
                                                                     subscriberDiscordUser.getMention() + " (" + subscriberDiscordUser.getTag() + ")", 
                                                                     false);
-            int monthAmount = (int)(subscriber.getBalance() / paymentConfig.getMonthlyPrice());
-            int remainders = (int)(subscriber.getBalance() % paymentConfig.getMonthlyPrice());
 
-            if (monthAmount == 0) {
+            embedCreateSpecBuilder.addField(
+                                        "Status: ",
+                                        "OK",
+                                        true);
+            embedCreateSpecBuilder.addField(
+                                    "Next Monthly Payment: ",
+                                    calculateNextDueDateTime(subscriber).format(DateTimeFormatter.ofPattern("dd/MM/uuuu")),
+                                    false);
+
+            if (calculateNextDueDateTime(subscriber).isBefore(LocalDateTime.now().withYear(LocalDateTime.now().getYear() + 1).withSecond(0).withNano(0).withMonth(1).withMinute(0).withHour(19).withDayOfMonth(paymentConfig.getInvoiceDate()))) {
                 embedCreateSpecBuilder.addField(
-                                            "", 
-                                           "You have already paid for this month" + ((remainders == 0) ? "." : String.format(" with %.2f remainders.", remainders)),
-                                          false);
-            } else {
-                embedCreateSpecBuilder.addField(
-                                            "", 
-                                           "You have already paid for the next " + String.format(" %s month" + (monthAmount == 1 ? "" : "s"), monthAmount - 1) + ((remainders == 0) ? "." : String.format(" with %.2f remainders.", remainders)),
-                                          false);
+                                    "",
+                                    String.format("You can wait until next month, or pay until the next year right now by **%.2f฿**.", calculatePriceUntilNextYear(subscriber)),
+                                    true);
             }
 
             EmbedCreateSpec embedCreateSpec = embedCreateSpecBuilder.build();

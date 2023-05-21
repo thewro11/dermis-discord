@@ -49,7 +49,6 @@ public class RejectButtonEventHandler implements DiscordEventSubscribable<Button
         if (requester != null) {
             LocalDateTime currentTime = LocalDateTime.now();
             User discordUser = App.gatewayDiscordClient.getUserById(Snowflake.of(requester.getUserId())).block();
-            Guild discordGuild = App.gatewayDiscordClient.getGuildById(Snowflake.of(requester.getGuildId())).block();
 
             EmbedCreateSpec embedCreateSpec = EmbedCreateSpec.builder()
                                                 .title("⛔️  Rejected Spotify Subscription Request")
@@ -57,13 +56,10 @@ public class RejectButtonEventHandler implements DiscordEventSubscribable<Button
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                                 false)
-                                                .addField("From: ", 
-                                                                discordGuild.getName(), 
-                                                                false)
                                                 .footer(ActionType.REQUEST_DENIED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                                                        discordGuild.getIconUrl(Format.PNG).get())
+                                                        App.owner.getAvatarUrl())
                                                 .build();
             message.edit()
             .withEmbeds(embedCreateSpec)
@@ -79,13 +75,10 @@ public class RejectButtonEventHandler implements DiscordEventSubscribable<Button
                                                 .addField("Requester: ", 
                                                                 discordUser.getMention() + " (" + discordUser.getTag() + ")", 
                                                                 false)
-                                                .addField("From: ", 
-                                                                discordGuild.getName(), 
-                                                                false)
                                                 .footer(ActionType.REQUEST_DENIED.NAME + 
                                                         " at " + 
                                                         currentTime.format(DateTimeFormatter.ofPattern("dd/MM/uuuu hh:mm:ss a")), 
-                                                        discordGuild.getIconUrl(Format.PNG).get())
+                                                        App.owner.getAvatarUrl())
                                                 .build();
 
             PrivateChannel privateChannel = discordUser.getPrivateChannel().block();

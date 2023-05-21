@@ -41,7 +41,11 @@ public class RejectPaymentButtonEventHandler implements DiscordEventSubscribable
 
     @Override
     public void handle(ButtonInteractionEvent event) {
-        event.deferReply().block();
+        try {
+            event.deferReply().block();
+        } catch (Exception e) {
+            
+        }
 
         LocalDateTime currentTime = LocalDateTime.now();
         String messageId = event.getInteraction().getMessageId().get().asString();

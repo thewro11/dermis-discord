@@ -35,9 +35,20 @@ public class StatusEventHandler implements DiscordEventSubscribable<ChatInputInt
 
     @Override
     public void handle(ChatInputInteractionEvent event) {
-        User discordUserSubscriber = event.getInteraction().getUser();
-        Subscriber subscriber = subscriberRepository.findById(discordUserSubscriber.getId().asString()).get();
-        subscriberService.sendPaymentNotification(subscriber);
+        try {
+            event.reply("Status sent to your private channel.").withEphemeral(true).block();
+        } catch (Exception e) {
+
+        }
+
+        try {
+            User discordUserSubscriber = event.getInteraction().getUser();
+            Subscriber subscriber = subscriberRepository.findById(discordUserSubscriber.getId().asString()).get();
+            subscriberService.sendPaymentNotification(subscriber);
+        } catch (Exception e) {
+            event.editReply("An error occurred. Please try again.").block();
+        }
+
     }
     
 }
