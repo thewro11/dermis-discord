@@ -1,0 +1,23 @@
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/dermis
+        username: root
+        password:
+    jpa:
+        generate-ddl: true
+        hibernate.ddl-auto: update
+
+discord:
+    credentials:
+        token: 
+    commands:
+        register: 
+        status: 
+        update: 
+        pay: 
+    version: 0.1β
+
+payment:
+    invoice-date: 11
+    notification: 0 0 19 ${payment.invoice-date} * ?
+    monthly-price: 34.00

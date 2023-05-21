@@ -12,4 +12,6 @@ public class DiscordConfig {
 
     private String token;
 
+    private String version;
+
 }
